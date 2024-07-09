@@ -2,11 +2,19 @@ const express = require('express');
 const fileSystem = require('fs');
 const app = express();
 const PORT = 8080;
+const cors = require('cors');
+const path = require('path');
 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.static('public'));
+app.use(cors());
 
 let videos = require('./data/videos.json');
+
+app.get('/', (req, res) => {
+    res.send('Server is running');
+  });
 
 app.get('/videos', (req, res) => {
     const videoInfo = videos.map(video => ({
@@ -27,11 +35,14 @@ app.get('/videos/:id', (req, res) => {
 });
 
 app.post('/videos', (req, res) => {
+    console.log('POST request received at /videos');
+    console.log('Request body:', req.body);
+
     const newVideo = {
         id: Date.now().toString(),
         title: req.body.title,
         description: req.body.description,
-        image: '/public/images/defualt-thumbnail.jpg',
+        image: '/images/defualt-thumbnail.jpg',
         views: 0,
         likes: 0,
         timestamp: Date.now(),
