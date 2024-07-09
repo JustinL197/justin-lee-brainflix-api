@@ -34,7 +34,11 @@ app.post('/videos', (req, res) => {
         image: '/public/images/defualt-thumbnail.jpg',
         views: 0,
         likes: 0,
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        channel: "author name",
+        duration: "0.00",
+        video:  "",
+        comments: []
     };
     videos.push(newVideo);
     fileSystem.writeFileSync('./data/videos.json', JSON.stringify(videos, null, 2));
