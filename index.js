@@ -1,14 +1,17 @@
 const express = require('express');
 const fileSystem = require('fs');
-const app = express();
-const PORT = 8080;
 const cors = require('cors');
 const path = require('path');
+require ('dotenv').config()
 
+const {PORT, BACKEND_URL} = process.env;
+const app = express();
+
+//middleware
+app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.static('public'));
-app.use(cors());
 
 let videos = require('./data/videos.json');
 
@@ -57,5 +60,5 @@ app.post('/videos', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on ${BACKEND_URL}:${PORT}`);
 });
