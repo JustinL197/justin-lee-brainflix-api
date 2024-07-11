@@ -11,7 +11,6 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(express.static('public'));
 
 let videos = require('./data/videos.json');
 
@@ -23,7 +22,8 @@ app.get('/videos', (req, res) => {
     const videoInfo = videos.map(video => ({
         id: video.id,
         title: video.title,
-        image: video.image
+        image: video.image,
+        channel: video.channel
     }));
     res.json(videoInfo);
 });
@@ -45,7 +45,7 @@ app.post('/videos', (req, res) => {
         id: Date.now().toString(),
         title: req.body.title,
         description: req.body.description,
-        image: '/images/defualt-thumbnail.jpg',
+        image: 'http://localhost:8080/images/default-thumbnail.jpg',
         views: 0,
         likes: 0,
         timestamp: Date.now(),
@@ -55,7 +55,7 @@ app.post('/videos', (req, res) => {
         comments: []
     };
     videos.push(newVideo);
-    fileSystem.writeFileSync('./data/videos.json', JSON.stringify(videos, null, 2));
+    fileSystem.writeFileSync(path.join(__dirname, 'data', 'videos.json'), JSON.stringify(videos, null, 2));
     res.status(201).json(newVideo);
 });
 
