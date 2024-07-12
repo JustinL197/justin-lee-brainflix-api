@@ -1,7 +1,8 @@
 const express = require('express');
-const fileSystem = require('fs');
+const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
+const videoRoute = require('./routes/videos');
 require ('dotenv').config()
 
 const {PORT, BACKEND_URL} = process.env;
@@ -11,15 +12,22 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use('/videos', videoRoute);
 
-let videos = require('./data/videos.json');
+const videosFilePath = path.join(__dirname, 'data/videos.json');
+
+const readVideoData = () => {
+    const videosData = fs.readFileSync(videosFilePath);
+    return JSON.parse(videosData);
+};
 
 app.get('/', (req, res) => {
     res.send('Server is running');
   });
 
 app.get('/videos', (req, res) => {
-    const videoInfo = videos.map(video => ({
+    const videoData = readVideoData();
+    const videoInfo = videoData.map(video => ({
         id: video.id,
         title: video.title,
         image: video.image,
@@ -29,7 +37,8 @@ app.get('/videos', (req, res) => {
 });
 
 app.get('/videos/:id', (req, res) => {
-    const video = videos.find(video => video.id === req.params.id);
+    const videoData = readVideoData();
+    const video = videoData.find(video => video.id === req.params.id);
     if (video){
         res.json(video);
     }else{
@@ -38,6 +47,7 @@ app.get('/videos/:id', (req, res) => {
 });
 
 app.post('/videos', (req, res) => {
+    const videoData = readVideoData();
     console.log('POST request received at /videos');
     console.log('Request body:', req.body);
 
@@ -49,13 +59,13 @@ app.post('/videos', (req, res) => {
         views: 0,
         likes: 0,
         timestamp: Date.now(),
-        channel: "author name",
+        channel: "Anonymous",
         duration: "0.00",
         video:  "",
         comments: []
     };
-    videos.push(newVideo);
-    fileSystem.writeFileSync(path.join(__dirname, 'data', 'videos.json'), JSON.stringify(videos, null, 2));
+    videoData.push(newVideo);
+    fileSystem.writeFileSync(path.join(__dirname, 'data', 'videos.json'), JSON.stringify(videoData, null, 2));
     res.status(201).json(newVideo);
 });
 

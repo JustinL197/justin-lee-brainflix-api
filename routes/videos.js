@@ -1,0 +1,41 @@
+const express = require('express');
+const router = express.Router();
+const fs = require('fs');
+const path = require('path');
+
+const videosFilePath = path.join(__dirname, '../data/videos.json');
+
+//function to read video data 
+const readVideoData = () => {
+    const videosData = fs.readFileSync(videosFilePath);
+    return JSON.parse(videosData);
+};
+
+//function to write data to videos file
+const writeVideoData = (data) => {
+    fs.writeFileSync(videosFilePath, JSON.stringify(data, null, 2));
+};
+
+router.post('/:id/comments', (req, res) => {
+    const videos = readVideoData();
+    const video = videos.find(video => video.id === req.params.id);
+
+    if (!video){
+        return res.status(404).send({message: "video not found"});
+    }
+
+    const newComment = {
+        id: Date.now().toString(),
+        name: req.body.name,
+        comment: req.body.comment,
+        likes: 0,
+        timestamp: Date.now()
+    };
+
+    video.comments.push(newComment);
+    writeVideoData(videos);
+
+    res.status(201).send(newComment);
+});
+
+module.exports = router;
