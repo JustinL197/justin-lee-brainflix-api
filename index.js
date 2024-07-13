@@ -48,8 +48,6 @@ app.get('/videos/:id', (req, res) => {
 
 app.post('/videos', (req, res) => {
     const videoData = readVideoData();
-    console.log('POST request received at /videos');
-    console.log('Request body:', req.body);
 
     const newVideo = {
         id: Date.now().toString(),
