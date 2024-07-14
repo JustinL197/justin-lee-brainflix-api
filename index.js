@@ -3,6 +3,7 @@ const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
 const videoRoute = require('./routes/videos');
+
 require ('dotenv').config()
 
 const {PORT, BACKEND_URL} = process.env;
@@ -48,7 +49,7 @@ app.get('/videos/:id', (req, res) => {
 
 app.post('/videos', (req, res) => {
     const videoData = readVideoData();
-
+    
     const newVideo = {
         id: Date.now().toString(),
         title: req.body.title,
@@ -63,9 +64,10 @@ app.post('/videos', (req, res) => {
         comments: []
     };
     videoData.push(newVideo);
-    fileSystem.writeFileSync(path.join(__dirname, 'data', 'videos.json'), JSON.stringify(videoData, null, 2));
+    fs.writeFileSync(path.join(__dirname, 'data', 'videos.json'), JSON.stringify(videoData, null, 2));
     res.status(201).json(newVideo);
 });
+    
 
 app.listen(PORT, () => {
     console.log(`Server is running on ${BACKEND_URL}:${PORT}`);
